@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const productCollection = 'products'; //por defecto le agrega una s para que sea plural si no se la agregamos
+const productCollection = 'product'; //por defecto le agrega una s para que sea plural si no se la agregamos
 
 const productSchema = new mongoose.Schema({
   title: String,

@@ -8,13 +8,13 @@ const getAll = async () => {
 
 //busca un carrito
 const getById = async (id) => {
-  const cart = await cartModel.findById(id);
+  const cart = await cartModel.findById(id).populate('products.product'); //importante, esto hace que en la consulta con el id de producto se traigan todos los datos
   return cart;
 };
 
 //crea un carrito
-const create = async () => {
-  const cart = await cartModel.create();
+const create = async (data) => {
+  const cart = await cartModel.create(data);
   return cart;
 };
 
@@ -31,29 +31,33 @@ const deleteOne = async (id) => {
 };
 
 //agregar prod a carrito
-const addProductToCart = async (id, product) => {
-  const cartAux = await cartModel.findById(id);
+const addProductToCart = async (cid, pid) => {
+  // const cartUpdated = await cartModel.findOneAndUpdate(
+  //   { _id: cid, 'products.$.product': pid },
+  //   { $inc: { 'products.$.quantity': 1 } },
+  //   { new: true }
+  // );
+  // //si no puede hacer el update porque no encuentra el prod, lo agrega
+  // if (!cartUpdated) {
+  //   await cartModel.updateOne(
+  //     { _id: cid },
+  //     { $push: { products: pid, quantity: 1 } }
+  //   );
+  // }
+  // return cartUpdated;
 
-  const indexP = cartAux.products.findIndex((prod) => prod.pid === pid); //busco el producto en el carrito
-  //si no lo encuentra lo agrego con qty 1
-  const cart = [];
-  if (indexP === -1) {
-    cart = await cartModel.findByIdAndUpdate(
-      id,
-      { $push: { products: product } },
-      { new: true }
-    );
-  } else {
-    //sino le agrego 1 a qty
-    let productQty = (cart.product[indexP].qty += 1);
-    cart = await cartModel.findByIdAndUpdate(
-      id,
-      { qty: productQty },
-      { new: true }
+  let cart = await cartModel.findOneAndUpdate(
+    { _id: cid, 'products.product': pid },
+    { $inc: { 'products.$.quantity': 1 } }
+  );
+  if (!cart) {
+    await cartModel.updateOne(
+      { _id: cid },
+      { $push: { products: { product: pid, quantity: 1 } } }
     );
   }
-
-  return cart;
+  const cartUpdated = await cartModel.findById(cid);
+  return cartUpdated;
 };
 export default {
   getAll,

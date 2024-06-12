@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import productManager from '../dao/fileSystem/managers/product.manager.js';
-import { io } from '../app.js'; //para websockets
+// import { io } from '../app.js'; //para websockets
 
 const router = Router();
 

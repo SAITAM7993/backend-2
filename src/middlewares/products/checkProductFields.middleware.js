@@ -23,9 +23,9 @@ function matchesFieldType(body, rules) {
     ) {
       //Se invalida si encuentra el primer tipo de dato que no coincida
       if (body[attribute] === '') {
-        error = `Error ${attribute} debe ser ${rules[attribute]} y no puede estar vacío`;
+        error = `error ${attribute} debe ser ${rules[attribute]} y no puede estar vacío`;
       } else {
-        error = `Error ${attribute} debe ser ${rules[attribute]}`;
+        error = `error ${attribute} debe ser ${rules[attribute]}`;
       }
       return error;
     }
@@ -35,7 +35,7 @@ function matchesFieldType(body, rules) {
   for (let attribute in body) {
     // console.log(attribute);
     if (!rules.hasOwnProperty(attribute))
-      error = `Error  producto no tiene el atribute ${attribute}`;
+      error = `error  producto no tiene el atribute ${attribute}`;
   }
   return error;
 }
@@ -50,7 +50,7 @@ export const checkProductFields = async (
     let error = matchesFieldType(req.body, fieldRules);
     if (error)
       return res.status(400).json({
-        status: 'Error',
+        status: 'error',
         msg: error,
       });
     next();
@@ -58,6 +58,6 @@ export const checkProductFields = async (
     console.log(error);
     res
       .status(500)
-      .json({ status: 'Error', msg: 'Error interno del servidor' });
+      .json({ status: 'error', msg: 'error interno del servidor' });
   }
 };

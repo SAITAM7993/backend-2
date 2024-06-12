@@ -4,6 +4,7 @@ import productDao from '../dao/mongoDB/product.dao.js'; //empezamos a usar el da
 import { checkProductAdd } from '../middlewares/products/checkProductAdd.middleware.js';
 import { checkProductUpdate } from '../middlewares/products/checkProductUpdate.middleware.js';
 import { checkProductFields } from '../middlewares/products/checkProductFields.middleware.js';
+import { checkProductExists } from '../middlewares/checkProductExists.middleware.js';
 const router = Router();
 
 //OBTENER PRODUCTOS TODOS Y LIMIT *************************************
@@ -23,16 +24,11 @@ router.get('/', async (req, res) => {
 });
 
 //OBTENER UN PRODUCTO *************************************
-router.get('/:pid', async (req, res) => {
+router.get('/:pid', checkProductExists, async (req, res) => {
   try {
+    //ya hago el control de si existe el prod en el middleware
     const { pid } = req.params;
-    // const product = await productManager.getProductById(pid);
     const product = await productDao.getById(pid);
-    if (!product)
-      return res
-        .status(404)
-        .json({ status: 'error', msg: 'Producto no encontrado' });
-
     res.status(200).json({ status: 'success', product });
   } catch (error) {
     console.log(error);
@@ -43,46 +39,35 @@ router.get('/:pid', async (req, res) => {
 });
 
 //BORRAR UN PRODUCTO *************************************
-router.delete('/:pid', async (req, res) => {
+router.delete('/:pid', checkProductExists, async (req, res) => {
   try {
+    //hago el control en el middleware
     const { pid } = req.params;
-    // const product = await productManager.deleteProduct(Number(pid));IMPORTANTE CUANDO USEMOS MONGO DESCOMENTAR ESTA LIN Y BORRAR LA DE ABAJO
-    // const product = await productManager.deleteProduct(pid);
-    const product = await productDao.deleteOne(pid);
-    if (!product)
-      return res
-        .status(404)
-        .json({ status: 'error', msg: 'Producto no encontrado' });
-
+    await productDao.deleteOne(pid);
     res.status(200).json({
       status: 'success',
-      msg: `El producto con el id ${pid} fue eliminado`,
+      msg: `el producto con el id ${pid} fue eliminado`,
     });
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .json({ status: 'error', msg: 'Error interno del servidor' });
+      .json({ status: 'error', msg: 'error interno del servidor' });
   }
 });
 
 //MODIFICAR UN PRODUCTO *************************************
 router.put(
   '/:pid',
+  checkProductExists,
   checkProductFields,
   checkProductUpdate,
   async (req, res) => {
     try {
+      //ya hago los controles en middleware
       const { pid } = req.params;
       const productData = req.body;
-      // const body = req.body;
-      // const product = await productManager.updateProduct(pid, body);
       const product = await productDao.update(pid, productData);
-      if (!product)
-        return res
-          .status(404)
-          .json({ status: 'error', msg: 'Producto no encontrado' });
-
       res.status(200).json({ status: 'success', product });
     } catch (error) {
       console.log(error);
