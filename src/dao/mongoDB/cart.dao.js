@@ -61,6 +61,32 @@ const addProductToCart = async (cid, pid) => {
   const cartUpdated = await cartModel.findById(cid);
   return cartUpdated;*/
 };
+
+//borra UN producto del carrito
+const deleteProductFromCart = async (cid, pid) => {
+  const cart = await cartModel.findById(cid); //busca carrito
+  cart.products = cart.products.filter((element) => element.product != pid); //filtra, saca el producto que le pasamos .importante filtrar con  != , si compara exacto no funciona
+  await cart.save(); //guardo el cart actualizado en mongo
+  return cart;
+};
+
+//actualizar la cantidad de UN producto en el carrito
+const updateProductQtyInCart = async (cid, pid, qty) => {
+  const cart = await cartModel.findById(cid); //busca carrito
+  const product = cart.products.find((element) => element.product == pid); //busco el producto en el carrito, tiene que ser con .product._id ya que el element es cart
+
+  product.quantity = qty; //le asigno la cantidad nueva
+  await cart.save(); //guardo el cart actualizado en mongo
+  return cart;
+};
+
+const emptyCart = async (cid) => {
+  const cart = await cartModel.findById(cid); //busca carrito
+  cart.products = [];
+  await cart.save();
+  return cart;
+};
+
 export default {
   getAll,
   getById,
@@ -68,4 +94,7 @@ export default {
   update,
   deleteOne,
   addProductToCart,
+  deleteProductFromCart,
+  updateProductQtyInCart,
+  emptyCart,
 };

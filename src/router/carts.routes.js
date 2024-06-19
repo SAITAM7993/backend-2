@@ -2,9 +2,9 @@ import { Router } from 'express';
 // import cartManager from '../dao/fileSystem/managers/cart.manager.js'; // ya no se usan los managers, reemplazado por los daos
 // import productManager from '../dao/fileSystem/managers/product.manager.js';
 import cartDao from '../dao/mongoDB/cart.dao.js';
-import productDao from '../dao/mongoDB/product.dao.js';
 import { checkProductExists } from '../middlewares/checkProductExists.middleware.js';
 import { checkCartExists } from '../middlewares/checkCartExists.middleware.js';
+import { checkProductQtyUpdate } from '../middlewares/checkProductQtyUpdate.js';
 
 const router = Router();
 
@@ -75,5 +75,67 @@ router.post(
     }
   }
 );
+
+//BORRAR PRODUCTO A CARRITO *************************************
+router.delete(
+  '/:cid/product/:pid',
+  checkProductExists,
+  checkCartExists,
+  async (req, res) => {
+    try {
+      //hago controles de existencia en los middlewares
+      const { cid, pid } = req.params; //obtengo cid y pid de parms
+      const cart = await cartDao.deleteProductFromCart(cid, pid);
+
+      res.status(200).json({ status: 'success', cart });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'Error interno del servidor' });
+    }
+  }
+);
+
+//MODIFICA CANTIDAD DE UN PRODUCTO EN EL CARRITO *************************************
+router.put(
+  '/:cid/product/:pid',
+  checkProductExists,
+  checkCartExists,
+  checkProductQtyUpdate,
+  async (req, res) => {
+    try {
+      //hago controles de existencia en los middlewares
+      const { cid, pid } = req.params; //obtengo cid y pid de parms
+      const { quantity } = req.body; //obtengo qty del body del request, importante que se llame igual a lo que le pase
+      const cart = await cartDao.updateProductQtyInCart(
+        cid,
+        pid,
+        Number(quantity)
+      );
+      res.status(200).json({ status: 'success', cart });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'Error interno del servidor' });
+    }
+  }
+);
+
+//BORRAR PRODUCTO A CARRITO *************************************
+router.delete('/:cid', checkCartExists, async (req, res) => {
+  try {
+    //hago controles de existencia en los middlewares
+    const { cid } = req.params; //obtengo cid y pid de parms
+    const cart = await cartDao.emptyCart(cid);
+    res.status(200).json({ status: 'success', cart });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: 'error', msg: 'Error interno del servidor' });
+  }
+});
 
 export default router;

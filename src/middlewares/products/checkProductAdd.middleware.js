@@ -14,7 +14,7 @@ export const checkProductAdd = async (req = request, res = response, next) => {
       category,
     };
     const products = await productDao.getAll(); //obtengo todos los productos
-    const productExists = products.find((p) => p.code === code); // Valida que no se repita el campo de code
+    const productExists = products.docs.find((p) => p.code === code); // Valida que no se repita el campo de code, se agrega el .docs ya que ahora productos viene dentro de docs
     if (productExists)
       return res.status(400).json({
         status: 'error',

@@ -18,17 +18,25 @@ router.get('/', async (req, res) => {
     const { limit, page, sort, category, status } = req.query; //todo esto es optativo
 
     const options = {
-      limit: limit || 5, //si no viene limite por defecto queda en 5
+      limit: limit || 10, //si no viene limite por defecto queda en 10
       page: page || 1, //si no viene pagina, por defecto queda en 1
       sort: { price: sort === 'asc' ? 1 : -1 }, //ordena por precio, si no viene el sort asc se ordena descendente
       learn: true,
     };
+    //nota mas adelante agregar un tolowercase en category para buscar y al insertar, por ahora no pude, se rompe y no trae nada, tambien agregar el filtro por dos o mas cosas a la vez ej categoria y status, ahora solo funciona con un filtro a la vez
 
     //si solicitan categoria
     if (category) {
       const products = await productDao.getAll({ category }, options);
       return res.status(200).json({ status: 'success', products });
     }
+
+    //si solicitan por status
+    if (status) {
+      const products = await productDao.getAll({ status }, options);
+      return res.status(200).json({ status: 'success', products });
+    }
+
     //si viene sin categoria no le paso filtro, solo las opciones
     const products = await productDao.getAll({}, options);
     return res.status(200).json({ status: 'success', products });
