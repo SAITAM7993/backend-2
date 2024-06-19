@@ -13,8 +13,25 @@ router.get('/', async (req, res) => {
     //dejamos de usar el product manager
     // const { limit } = req.query;
     // const products = await productManager.getProducts(limit);
-    const products = await productDao.getAll();
-    res.status(200).json({ status: 'success', products });
+
+    //se agrega paginate
+    const { limit, page, sort, category, status } = req.query; //todo esto es optativo
+
+    const options = {
+      limit: limit || 5, //si no viene limite por defecto queda en 5
+      page: page || 1, //si no viene pagina, por defecto queda en 1
+      sort: { price: sort === 'asc' ? 1 : -1 }, //ordena por precio, si no viene el sort asc se ordena descendente
+      learn: true,
+    };
+
+    //si solicitan categoria
+    if (category) {
+      const products = await productDao.getAll({ category }, options);
+      return res.status(200).json({ status: 'success', products });
+    }
+    //si viene sin categoria no le paso filtro, solo las opciones
+    const products = await productDao.getAll({}, options);
+    return res.status(200).json({ status: 'success', products });
   } catch (error) {
     console.log(error);
     res

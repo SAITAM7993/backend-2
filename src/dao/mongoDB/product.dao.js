@@ -1,7 +1,8 @@
 import { productModel } from './models/product.model.js';
 //obtiene todos los productos
-const getAll = async () => {
-  const products = await productModel.find({ status: true });
+const getAll = async (query, options) => {
+  // const products = await productModel.find({ status: true }); //se cambia por logica de paginate
+  const products = await productModel.paginate(query, options);
   return products;
 };
 

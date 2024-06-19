@@ -32,20 +32,22 @@ const deleteOne = async (id) => {
 
 //agregar prod a carrito
 const addProductToCart = async (cid, pid) => {
-  // const cartUpdated = await cartModel.findOneAndUpdate(
-  //   { _id: cid, 'products.$.product': pid },
-  //   { $inc: { 'products.$.quantity': 1 } },
-  //   { new: true }
-  // );
-  // //si no puede hacer el update porque no encuentra el prod, lo agrega
-  // if (!cartUpdated) {
-  //   await cartModel.updateOne(
-  //     { _id: cid },
-  //     { $push: { products: pid, quantity: 1 } }
-  //   );
-  // }
-  // return cartUpdated;
+  //este cod es JS solamente
+  const cart = await cartModel.findById(cid); //busca carrito
 
+  const productInCart = cart.products.find((element) => element.product == pid); //busco el producto en el carrito
+
+  if (productInCart) {
+    //si lo encuentro le agrego 1 a la propiedad quantity
+    productInCart.quantity++;
+  } else {
+    cart.products.push({ product: pid, quantity: 1 }); //si no lo encuentro, lo agrego al carrito con cantidad 1
+  }
+
+  await cart.save(); //con el save guardamos los cambios
+  return cart;
+  /*
+  codigo usando sintaxis de MONGO, hace lo mismo que el de arriba
   let cart = await cartModel.findOneAndUpdate(
     { _id: cid, 'products.product': pid },
     { $inc: { 'products.$.quantity': 1 } }
@@ -57,7 +59,7 @@ const addProductToCart = async (cid, pid) => {
     );
   }
   const cartUpdated = await cartModel.findById(cid);
-  return cartUpdated;
+  return cartUpdated;*/
 };
 export default {
   getAll,

@@ -6,16 +6,20 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/app.js"
+    "dev": "nodemon ./src/app.js",
+    "productGenerator": "node ./src/seed/productGenerator.js",
+    "seedProduct": "node ./src/seed/seedToMongoose.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-handlebars": "^7.1.2",
     "mongoose": "^8.4.1",
+    "mongoose-paginate-v2": "^1.8.2",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
