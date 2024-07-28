@@ -8,7 +8,7 @@ import { passportCall } from '../middlewares/passport.middleware.js';
 const router = Router();
 
 //CREO USUARIO
-//metodo con passport
+//metodo con passport local
 router.post('/register', passportCall('register'), async (req, res) => {
   try {
     res.status(201).json({ status: 'ok', msg: 'User created' });
@@ -33,8 +33,7 @@ router.post('/register', async (req, res) => {
   }
 });*/
 
-//HAGO LOGIN DE USUARIO
-
+//HAGO LOGIN DE USUARIO local
 router.post('/login', passportCall('login'), async (req, res) => {
   try {
     const token = createToken(req.user);
@@ -48,7 +47,7 @@ router.post('/login', passportCall('login'), async (req, res) => {
   }
 });
 
-//auth con JWT
+//auth con JWT local
 router.post('/auth', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -98,6 +97,7 @@ router.post('/login', async (req, res) => {
   }
 });*/
 
+//estrategia de terceros
 //inicio/reg con google
 //para probar esto debemos dirigirnos (en el navegador) al endpoint configurado para la estrategia de logeo/ registro en este caso http://localhost:8080/api/session/google
 router.get(
