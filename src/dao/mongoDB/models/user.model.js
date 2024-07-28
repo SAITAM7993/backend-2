@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false, //sino mongo rompe cuando usamos autentificacion por google
   },
   email: {
     type: String,
@@ -22,9 +22,17 @@ const userSchema = new mongoose.Schema({
   },
   age: {
     type: Number,
-    required: true,
+    required: false, //sino mongo rompe cuando usamos autentificacion por google
   },
+  role: {
+    type: String,
+    default: 'user',
+  },
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'cart' }, //por defecto le crea un carrito y lo asocia al user
 });
-
+//hago un populate del cart con los productos
+userSchema.pre('findOne', function () {
+  this.populate('cart');
+});
 export const userModel = mongoose.model(userCollection, userSchema);
 //ver si aplicar la logica de required y unique a product y cart
