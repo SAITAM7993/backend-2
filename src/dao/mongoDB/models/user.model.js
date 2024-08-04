@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: 'user',
+    default: 'user', //por defecto el rol user
   },
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'cart' }, //por defecto le crea un carrito y lo asocia al user
 });

@@ -5,6 +5,10 @@ import cartDao from '../dao/mongoDB/cart.dao.js';
 import { checkProductExists } from '../middlewares/checkProductExists.middleware.js';
 import { checkCartExists } from '../middlewares/checkCartExists.middleware.js';
 import { checkProductQtyUpdate } from '../middlewares/checkProductQtyUpdate.js';
+import { authorization } from '../middlewares/authorization.middleware.js';
+import { passportCall } from '../middlewares/passport.middleware.js';
+
+//nota: definir los controles sobre carritos, ej si para crear carrito hay que ser admin.. ver si afecta en el back al crear el carrito automaticamente cuando se crea el usuario, se agregaron algunos controles de autorizacion segun creia conveniente, casi todos controlan el jwt
 
 const router = Router();
 
@@ -23,7 +27,7 @@ router.post('/', async (req, res) => {
 });
 
 //OBTENER CARRITO PRO CID *************************************
-router.get('/:cid', checkCartExists, async (req, res) => {
+router.get('/:cid', passportCall('jwt'), checkCartExists, async (req, res) => {
   try {
     const { cid } = req.params; //obtengo cid de los parms
     const cart = await cartDao.getById(cid);
@@ -37,27 +41,33 @@ router.get('/:cid', checkCartExists, async (req, res) => {
 });
 
 //OBTENER CARRITOS *************************************
-router.get('/', async (req, res) => {
-  try {
-    // const carts = await cartManager.getCarts();
-    const carts = await cartDao.getAll();
-    if (!carts)
-      return res
-        .status(404)
-        .json({ status: 'Error', msg: 'No existen carritos' });
+router.get(
+  '/',
+  passportCall('jwt'),
+  authorization('admin'),
+  async (req, res) => {
+    try {
+      // const carts = await cartManager.getCarts();
+      const carts = await cartDao.getAll();
+      if (!carts)
+        return res
+          .status(404)
+          .json({ status: 'Error', msg: 'No existen carritos' });
 
-    res.status(200).json({ status: 'success', carts });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: 'error', msg: 'Error interno del servidor' });
+      res.status(200).json({ status: 'success', carts });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'Error interno del servidor' });
+    }
   }
-});
+);
 
 //AGREGAR PRODUCTO A CARRITO *************************************
 router.post(
   '/:cid/product/:pid',
+  passportCall('jwt'),
   checkProductExists,
   checkCartExists,
   async (req, res) => {
@@ -79,6 +89,7 @@ router.post(
 //BORRAR PRODUCTO A CARRITO *************************************
 router.delete(
   '/:cid/product/:pid',
+  passportCall('jwt'),
   checkProductExists,
   checkCartExists,
   async (req, res) => {
@@ -100,6 +111,7 @@ router.delete(
 //MODIFICA CANTIDAD DE UN PRODUCTO EN EL CARRITO *************************************
 router.put(
   '/:cid/product/:pid',
+  passportCall('jwt'),
   checkProductExists,
   checkCartExists,
   checkProductQtyUpdate,
@@ -124,18 +136,23 @@ router.put(
 );
 
 //BORRAR PRODUCTO A CARRITO *************************************
-router.delete('/:cid', checkCartExists, async (req, res) => {
-  try {
-    //hago controles de existencia en los middlewares
-    const { cid } = req.params; //obtengo cid y pid de parms
-    const cart = await cartDao.emptyCart(cid);
-    res.status(200).json({ status: 'success', cart });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: 'error', msg: 'Error interno del servidor' });
+router.delete(
+  '/:cid',
+  passportCall('jwt'),
+  checkCartExists,
+  async (req, res) => {
+    try {
+      //hago controles de existencia en los middlewares
+      const { cid } = req.params; //obtengo cid y pid de parms
+      const cart = await cartDao.emptyCart(cid);
+      res.status(200).json({ status: 'success', cart });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'Error interno del servidor' });
+    }
   }
-});
+);
 
 export default router;

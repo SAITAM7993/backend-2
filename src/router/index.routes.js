@@ -9,7 +9,7 @@ router.use('/products', productsRouter);
 router.use('/carts', cartsRouter);
 router.use('/session', sessionRouter);
 
-//para controlar rutas que ingresen
+//para controlar rutas que ingresen, si no existe la ruta devuelvo error, funciona para TODAS las rutas, PRODUCTS, CART, SESSION
 router.get('*', async (req, res) => {
   try {
     res.status(404).json({ status: 'error', msg: 'Route not found' });

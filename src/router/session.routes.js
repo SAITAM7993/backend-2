@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import userDao from '../dao/mongoDB/user.dao.js';
-import { createHash, isValidPassword } from '../utils/hashPassword.js'; //para hasheo de pass
+//import userDao from '../dao/mongoDB/user.dao.js'; -ya no se hace aca
+//import { createHash, isValidPassword } from '../utils/hashPassword.js'; //para hasheo de pass -ya no se hace aca
 import passport from 'passport'; //passport
 import { createToken } from '../utils/jwt.js'; //para tokens
 import { passportCall } from '../middlewares/passport.middleware.js';
@@ -47,24 +47,24 @@ router.post('/login', passportCall('login'), async (req, res) => {
   }
 });
 
-//auth con JWT local
-router.post('/auth', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await userDao.getByEmail(email);
-    if (!user || !isValidPassword(user.password, password))
-      return res
-        .status(401)
-        .json({ status: 'error', msg: 'incorrect email or password ' }); //si usuario o pass es incorrecto le doy error, sino creo un token
-    const token = createToken(user);
-    res.cookie('token', token, { httpOnly: true });
+//auth con JWT local - se dea de usar ya que en la etrategia login setea el token en la cookie
+// router.post('/auth', async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await userDao.getByEmail(email);
+//     if (!user || !isValidPassword(user.password, password))
+//       return res
+//         .status(401)
+//         .json({ status: 'error', msg: 'incorrect email or password ' }); //si usuario o pass es incorrecto le doy error, sino creo un token
+//     const token = createToken(user);
+//     res.cookie('token', token, { httpOnly: true });
 
-    return res.status(200).json({ status: 'ok', token });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: 'error', msg: 'Internal server error' });
-  }
-});
+//     return res.status(200).json({ status: 'ok', token });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ status: 'error', msg: 'Internal server error' });
+//   }
+// });
 
 /* metodo viejo
 router.post('/login', async (req, res) => {

@@ -13,7 +13,7 @@ const router = Router();
 router.get(
   '/',
   passportCall('jwt'), //si el jwt no da un ok no le muestro los productos
-  authorization('admin'), //si no es admin no dejo que vea todos los prod
+  //authorization('admin'), //si no es admin no dejo que vea todos los prod, lo cambio ya que todos los deberian ver
   async (req, res) => {
     //se hace una llamada a passport y atorizamos con authorization
     try {
@@ -53,44 +53,60 @@ router.get(
 );
 
 //OBTENER UN PRODUCTO *************************************
-router.get('/:pid', checkProductExists, async (req, res) => {
-  try {
-    //ya hago el control de si existe el prod en el middleware
-    const { pid } = req.params;
-    const product = await productDao.getById(pid);
-    res.status(200).json({ status: 'success', product });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: 'error', msg: 'Error interno del servidor' });
+router.get(
+  '/:pid',
+  passportCall('jwt'),
+  checkProductExists,
+  async (req, res) => {
+    //agrego control de jwt
+    try {
+      //ya hago el control de si existe el prod en el middleware
+      const { pid } = req.params;
+      const product = await productDao.getById(pid);
+      res.status(200).json({ status: 'success', product });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'Error interno del servidor' });
+    }
   }
-});
+);
 
 //BORRAR UN PRODUCTO *************************************
-router.delete('/:pid', checkProductExists, async (req, res) => {
-  try {
-    //hago el control en el middleware
-    const { pid } = req.params;
-    await productDao.deleteOne(pid);
-    res.status(200).json({
-      status: 'success',
-      msg: `el producto con el id ${pid} fue eliminado`,
-    });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: 'error', msg: 'error interno del servidor' });
+router.delete(
+  '/:pid',
+  checkProductExists,
+  passportCall('jwt'),
+  authorization('admin'),
+  async (req, res) => {
+    //agrego que necesite ser admin para borrar
+    try {
+      //hago el control en el middleware
+      const { pid } = req.params;
+      await productDao.deleteOne(pid);
+      res.status(200).json({
+        status: 'success',
+        msg: `el producto con el id ${pid} fue eliminado`,
+      });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'error interno del servidor' });
+    }
   }
-});
+);
 
 //MODIFICAR UN PRODUCTO *************************************
 router.put(
   '/:pid',
+  passportCall('jwt'),
+  authorization('admin'), //agrego que necesite ser admin para modificar
   checkProductExists,
   checkProductFields,
   checkProductUpdate,
+
   async (req, res) => {
     try {
       //ya hago los controles en middleware
@@ -107,19 +123,27 @@ router.put(
   }
 );
 
-//CREAR UN PRODUCTO *************************************
-router.post('/', checkProductFields, checkProductAdd, async (req, res) => {
-  try {
-    // const body = req.body;
-    // const product = await productManager.addProduct(body);
-    const productData = req.body;
-    const product = await productDao.create(productData);
-    res.status(201).json({ status: 'success', product });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: 'error', msg: 'Error interno del servidor' });
+//CREAR UN PRODUCTO *************************************}
+//agrego que necesite ser admin para crear
+router.post(
+  '/',
+  passportCall('jwt'),
+  authorization('admin'),
+  checkProductFields,
+  checkProductAdd,
+  async (req, res) => {
+    try {
+      // const body = req.body;
+      // const product = await productManager.addProduct(body);
+      const productData = req.body;
+      const product = await productDao.create(productData);
+      res.status(201).json({ status: 'success', product });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: 'error', msg: 'Error interno del servidor' });
+    }
   }
-});
+);
 export default router;
