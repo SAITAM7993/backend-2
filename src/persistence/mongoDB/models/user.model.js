@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2'; //importante instalado mediante npm install mongoose-paginate-v2
 
 const userCollection = 'user';
 
@@ -30,6 +31,9 @@ const userSchema = new mongoose.Schema({
   },
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'cart' }, //por defecto le crea un carrito y lo asocia al user
 });
+
+userSchema.plugin(mongoosePaginate); //agregamos el plugin mongoose paginate sino no funciona, cuando consultemos los prod nos devuelve todo paginado
+
 //hago un populate del cart con los productos
 userSchema.pre('findOne', function () {
   this.populate('cart');

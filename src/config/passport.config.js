@@ -3,10 +3,11 @@ import google from 'passport-google-oauth20';
 import jwt from 'passport-jwt';
 import local from 'passport-local';
 import passportCustom from 'passport-custom';
-import cartDao from '../dao/mongoDB/cart.dao.js';
-import userDao from '../dao/mongoDB/user.dao.js';
+import cartRepository from '../persistence/mongoDB/cart.repository.js';
+import userRepository from '../persistence/mongoDB/user.repository.js';
 import { cookieExtractor } from '../utils/cookieExtractor.js';
 import { createHash, isValidPassword } from '../utils/hashPassword.js';
+import { respUserDto } from '../dto/user.dto.js';
 import envs from './envs.config.js';
 import { verifyToken } from '../utils/jwt.js';
 //estrategias, locales, google y jwt
@@ -34,12 +35,12 @@ export const initializePassport = () => {
       */
         try {
           const { first_name, last_name, age } = req.body;
-          const user = await userDao.getByEmail(username);
+          const user = await userRepository.getByEmail(username);
           if (user)
             return done(null, false, { message: 'User already exists' }); //si existe usuario devuelvo que ya existe
           //el primer parametro es si hay un error, como no hay error en si de passport va en null, en el segundo le pasamos el usuario, como ya existe no lo devuelvo (y ademas es un register), el tercer parametro es el mensaje
 
-          const cart = await cartDao.create(); //en caso contrario lo creo con su carrito asociado
+          const cart = await cartRepository.create(); //en caso contrario lo creo con su carrito asociado
           const newUser = {
             first_name,
             last_name,
@@ -49,7 +50,7 @@ export const initializePassport = () => {
             cart: cart._id, //le paso el carrito asi queda asociado al user
           };
 
-          const userCreate = await userDao.create(newUser); //uso el userdao para crearlo y obtenerlo
+          const userCreate = await userRepository.create(newUser); //uso el userRepository para crearlo y obtenerlo
 
           return done(null, userCreate); //devuelvo el usuario creado
         } catch (error) {
@@ -65,12 +66,12 @@ export const initializePassport = () => {
       { usernameField: 'email' },
       async (username, password, done) => {
         try {
-          const user = await userDao.getByEmail(username);
+          const user = await userRepository.getByEmail(username);
 
           if (!user || !isValidPassword(user.password, password))
             return done(null, false, { message: 'User or email invalid' });
-
-          return done(null, user);
+          const userResp = respUserDto(user);
+          return done(null, userResp);
         } catch (error) {
           done(error);
         }
@@ -122,7 +123,7 @@ export const initializePassport = () => {
 }
           */
           const { name, emails } = profile; //tomamos los datos devueltos por google
-          const user = await userDao.getByEmail(emails[0].value); //en este caso obtenemos el mail de los datos devueltos por google
+          const user = await userRepository.getByEmail(emails[0].value); //en este caso obtenemos el mail de los datos devueltos por google
 
           if (user) {
             //si existe devuelvo el user
@@ -135,7 +136,7 @@ export const initializePassport = () => {
               email: emails[0].value,
             };
 
-            const userCreate = await userDao.create(newUser);
+            const userCreate = await userRepository.create(newUser);
             return cb(null, userCreate); //cb es callback, le pasamos error null y el usuario creado
           }
         } catch (error) {
@@ -172,8 +173,9 @@ export const initializePassport = () => {
         if (!token) return done(null, false);
         const tokenVerify = verifyToken(token);
         if (!tokenVerify) return done(null, false);
-        const user = await userDao.getByEmail(tokenVerify.email);
-        done(null, user);
+        const user = await userRepository.getByEmail(tokenVerify.email);
+        const userResp = respUserDto(user); //para dar datos acotados
+        return done(null, userResp);
       } catch (error) {
         done(error);
       }
@@ -193,7 +195,7 @@ export const initializePassport = () => {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await userDao.getById(id);
+      const user = await userRepository.getById(id);
       done(null, user);
     } catch (error) {
       done(error);

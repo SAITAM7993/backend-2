@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import productsRouter from './products.routes.js';
-import cartsRouter from './carts.routes.js';
-import sessionRouter from './session.routes.js';
+import productRouter from './product.routes.js';
+import cartRouter from './cart.routes.js';
+import userRouter from './user.routes.js';
 
 const router = Router();
 
-router.use('/products', productsRouter);
-router.use('/carts', cartsRouter);
-router.use('/session', sessionRouter);
+router.use('/products', productRouter);
+router.use('/carts', cartRouter);
+router.use('/session', userRouter);
 
 //para controlar rutas que ingresen, si no existe la ruta devuelvo error, funciona para TODAS las rutas, PRODUCTS, CART, SESSION
 router.get('*', async (req, res) => {

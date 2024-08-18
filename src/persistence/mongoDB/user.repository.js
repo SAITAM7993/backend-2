@@ -1,16 +1,16 @@
 import { userModel } from './models/user.model.js';
 
 //OBTENGO todos los usuarios
-const getAll = async (query, options) => {
+const getUsers = async (query, options) => {
   const users = await userModel.paginate(query, options);
   return users;
 };
 
-//OBTENGO USUARIO por ID
-const getById = async (id) => {
-  const user = await userModel.findById(id);
-  return user;
-};
+// //OBTENGO USUARIO por ID
+// const getById = async (id) => {
+//   const user = await userModel.findById(id);
+//   return user;
+// };
 
 //OBTENGO USUARIO por EMAIL
 const getByEmail = async (email) => {
@@ -41,8 +41,7 @@ const deleteOne = async (id) => {
 };
 
 export default {
-  getAll,
-  getById,
+  getUsers,
   create,
   update,
   deleteOne,

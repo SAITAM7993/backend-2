@@ -1,3 +1,4 @@
+//esta capa solo se comunica con la bdd no debe tener nada de la logica de negocio ni controles
 import { cartModel } from './models/cart.model.js';
 
 //trae todos los carritos
@@ -46,20 +47,6 @@ const addProductToCart = async (cid, pid) => {
 
   await cart.save(); //con el save guardamos los cambios
   return cart;
-  /*
-  codigo usando sintaxis de MONGO, hace lo mismo que el de arriba
-  let cart = await cartModel.findOneAndUpdate(
-    { _id: cid, 'products.product': pid },
-    { $inc: { 'products.$.quantity': 1 } }
-  );
-  if (!cart) {
-    await cartModel.updateOne(
-      { _id: cid },
-      { $push: { products: { product: pid, quantity: 1 } } }
-    );
-  }
-  const cartUpdated = await cartModel.findById(cid);
-  return cartUpdated;*/
 };
 
 //borra UN producto del carrito
@@ -80,12 +67,14 @@ const updateProductQtyInCart = async (cid, pid, qty) => {
   return cart;
 };
 
-const emptyCart = async (cid) => {
+//borrar carrito
+const clearCart = async (cid) => {
   const cart = await cartModel.findById(cid); //busca carrito
   cart.products = [];
   await cart.save();
   return cart;
 };
+
 
 export default {
   getAll,
@@ -96,5 +85,5 @@ export default {
   addProductToCart,
   deleteProductFromCart,
   updateProductQtyInCart,
-  emptyCart,
+  clearCart,
 };

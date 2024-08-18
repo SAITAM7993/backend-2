@@ -1,6 +1,6 @@
 import { request, response } from 'express';
-// import productManager from '../../dao/fileSystem/managers/product.manager.js'; // ya no se utiliza, reemplazado por productDao
-import productDao from '../../dao/mongoDB/product.dao.js';
+// import productManager from '../../dao/fileSystem/managers/product.manager.js'; // ya no se utiliza, reemplazado por productRepository
+import productRepository from '../../persistence/mongoDB/product.repository.js';
 
 export const checkProductUpdate = async (
   req = request,
@@ -11,7 +11,7 @@ export const checkProductUpdate = async (
     const { code } = req.body;
     const { pid } = req.params;
     //const products = await productManager.getProducts(); //obtengo todos los productos
-    const products = await productDao.getAll();
+    const products = await productRepository.getAll();
     const productExists = products.docs.find((p) => p.code === code); // Valida que no se repita el campo de code
 
     //con esto le dejo modificar si justo le envio el mismo codigo que tenia el propio producto (ej id 1 codigo 1, si encuentro el codigo 1 en id 2 ahi le tiero el error)
