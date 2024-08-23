@@ -5,10 +5,11 @@ import envs from '../config/envs.config.js'; //traigo de envs el jwt secret code
 
 //creo token para usuario
 export const createToken = (user) => {
+  console.log(user);
   const { _id, email, role, cart } = user;
   const token = jwt.sign({ _id, email, role, cart }, envs.JWT_SECRET_CODE, {
-    expiresIn: '2m',
-  }); //le paso id de usuario, mail, rol y carrito, el token expira en 2 minutos
+    expiresIn: '10m',
+  }); //le paso id de usuario, mail, rol y carrito, el token expira en 10 minutos
 
   return token;
 };

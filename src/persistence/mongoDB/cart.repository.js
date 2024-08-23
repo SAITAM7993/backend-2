@@ -8,8 +8,8 @@ const getAll = async () => {
 };
 
 //busca un carrito
-const getById = async (id) => {
-  const cart = await cartModel.findById(id).populate('products.product'); //importante, esto hace que en la consulta con el id de producto se traigan todos los datos
+const getById = async (cid) => {
+  const cart = await cartModel.findById(cid).populate('products.product'); //importante, esto hace que en la consulta con el id de producto se traigan todos los datos
   return cart;
 };
 
@@ -20,14 +20,16 @@ const create = async (data) => {
 };
 
 //update de carrito
-const update = async (id, data) => {
-  const cartUpdate = await cartModel.findByIdAndUpdate(id, data, { new: true });
+const update = async (cid, data) => {
+  const cartUpdate = await cartModel.findByIdAndUpdate(cid, data, {
+    new: true,
+  });
   return cartUpdate;
 };
 
 //borrado de carrito
-const deleteOne = async (id) => {
-  const cart = await cartModel.deleteOne({ _id: id });
+const deleteOne = async (cid) => {
+  const cart = await cartModel.deleteOne({ _id: cid });
   return cart;
 };
 
@@ -74,7 +76,6 @@ const clearCart = async (cid) => {
   await cart.save();
   return cart;
 };
-
 
 export default {
   getAll,

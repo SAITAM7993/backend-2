@@ -5,7 +5,7 @@ import { checkProductQtyUpdate } from '../middlewares/checkProductQtyUpdate.js';
 import { authorization } from '../middlewares/authorization.middleware.js';
 import { passportCall } from '../middlewares/passport.middleware.js';
 import cartControllers from '../controllers/cart.controllers.js';
-
+import { isUserCart } from '../middlewares/isUserCart.middleware.js';
 //nota: definir los controles sobre carritos, ej si para crear carrito hay que ser admin.. ver si afecta en el back al crear el carrito automaticamente cuando se crea el usuario, se agregaron algunos controles de autorizacion segun creia conveniente, casi todos controlan el jwt
 
 const router = Router();
@@ -14,7 +14,7 @@ const router = Router();
 router.post('/', cartControllers.createCart);
 
 //OBTENER CARRITO PRO CID *************************************
-router.get('/:cid', cartControllers.getCartById);
+router.get('/:cid', checkCartExists, cartControllers.getCartById);
 
 //OBTENER CARRITOS *************************************
 router.get(
@@ -27,6 +27,8 @@ router.get(
 router.post(
   '/:cid/product/:pid',
   passportCall('jwt'),
+  authorization('user'),
+  isUserCart,
   checkProductExists,
   checkCartExists,
   cartControllers.addProductToCart
@@ -36,6 +38,8 @@ router.post(
 router.delete(
   '/:cid/product/:pid',
   passportCall('jwt'),
+  authorization('user'),
+  isUserCart,
   checkProductExists,
   checkCartExists,
   cartControllers.removeProductFromCart
@@ -45,6 +49,8 @@ router.delete(
 router.put(
   '/:cid/product/:pid',
   passportCall('jwt'),
+  authorization('user'),
+  isUserCart,
   checkProductExists,
   checkCartExists,
   checkProductQtyUpdate,
@@ -55,11 +61,18 @@ router.put(
 router.delete(
   '/:cid',
   passportCall('jwt'),
+  authorization('user'),
+  isUserCart,
   checkCartExists,
   cartControllers.clearCart
 );
 
 //GENERAR COMPRA *************************************
-router.get('/:cid/purchase', passportCall('jwt'), cartControllers.purchaseCart);
+router.get(
+  '/:cid/purchase',
+  passportCall('jwt'),
+  isUserCart,
+  cartControllers.purchaseCart
+);
 
 export default router;

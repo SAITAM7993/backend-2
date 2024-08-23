@@ -29,7 +29,8 @@
     "passport-custom": "^1.1.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

@@ -25,6 +25,6 @@ export const respUserDto = (user) => {
     last_name: user.last_name,
     email: user.email,
     role: user.role,
-    // cart_id: user.cart._id,
+    cart: user.cart._id,
   };
 };
