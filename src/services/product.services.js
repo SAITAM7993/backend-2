@@ -16,11 +16,11 @@ const getProducts = async (query, options) => {
 };
 
 const updateProduct = async (pid, data) => {
-  return await productRepository.create(pid, data);
+  return await productRepository.update(pid, data);
 };
 
-const deleteProduct = async (pid) => {
-  return await productRepository.create(pid);
+const deleteOne = async (pid) => {
+  return await productRepository.deleteOne(pid);
 };
 
 export default {
@@ -28,5 +28,5 @@ export default {
   getProductById,
   getProducts,
   updateProduct,
-  deleteProduct,
+  deleteOne,
 };

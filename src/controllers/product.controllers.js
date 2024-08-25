@@ -2,7 +2,7 @@ import productServices from '../services/product.services.js';
 const createProduct = async (req, res) => {
   try {
     const productData = req.body;
-    const product = await productServices.create(productData);
+    const product = await productServices.createProduct(productData);
     res.status(201).json({ status: 'success', product });
   } catch (error) {
     console.log(error);
@@ -65,6 +65,7 @@ const getProducts = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     //ya hago los controles en middleware
+
     const { pid } = req.params;
     const productData = req.body;
     const product = await productServices.updateProduct(pid, productData);
@@ -82,7 +83,7 @@ const deleteProduct = async (req, res) => {
   try {
     //hago el control en el middleware
     const { pid } = req.params;
-    await productServices.deleteProduct(pid);
+    await productServices.deleteOne(pid);
     res.status(200).json({
       status: 'success',
       msg: `el producto con el id ${pid} fue eliminado`,

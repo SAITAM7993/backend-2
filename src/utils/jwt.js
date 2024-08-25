@@ -8,7 +8,7 @@ export const createToken = (user) => {
   console.log(user);
   const { _id, email, role, cart } = user;
   const token = jwt.sign({ _id, email, role, cart }, envs.JWT_SECRET_CODE, {
-    expiresIn: '10m',
+    expiresIn: '30m',
   }); //le paso id de usuario, mail, rol y carrito, el token expira en 10 minutos
 
   return token;

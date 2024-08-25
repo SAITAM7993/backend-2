@@ -51,7 +51,6 @@ const purchaseCart = async (cid) => {
     } else {
       productsWithOutStock.push(productCart); //sino lo agrego a la lista de productos sin stock
     }
-
     await cartRepository.update(cid, { products: productsWithOutStock });
   }
 
